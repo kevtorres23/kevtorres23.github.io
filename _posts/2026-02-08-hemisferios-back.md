@@ -120,7 +120,7 @@ A route can be understood as a **URL contained in an HTTP method that allows the
 
 The *routes* folder, within the *src* directory, is the place where we'll save our route configuration files.
 
-The following are the route files I created and their purpose for the project:
+The following are the route files I created:
 
 - ```appointmentRoutes.js```
 - ```contactMessageRoutes.js```
@@ -161,13 +161,136 @@ export default router;
 
 Here, we first import the Express module and the controller files from their location in the directory. Then, we include them in the parameters of the router's HTTP method parameters.
 
-## Universal routes with `app.use()`
-Write how is `app.use("/api/appointments/", appointmentRoutes);` used to make it possible to improve the maintainabilty of the route declaration.
+## Route maintainability with `app.use()`
+Since this project relies mainly on four main schemas or objects (appointments, patients, therapists, and contact messages), we'll need to specify the route that should meet each one of them.
+
+With the ```app.use()``` function, we can declare the path of the routes only once in the ```server.js``` file by doing the following:
+
+- First, **import the router of a schema in the ```server.js``` file**. 
+ 
+    The router of a schema is defined in the route file of that schema (see how we wrote `export default router` in the previous section [Interaction between routes and controlles](#interaction-between-routes-and-controllers), to export the router of the appointment schemas, defined in the ```appointmentRoutes.js``` file.)
+
+- Then, **add the imported router in the ```app.use()``` function** as its second parameter.
+
+    In this method, the ```app.use()``` function receives two parameters: the first one is the route path for the schema, and the second one is the router that manages that schema.
+
+With this method, each route declared in the route file of the schema will know which path to take. Refer to the following route:
+
+`router.get("/", getAllAppointments);`
+
+We no longer have to write ```/api/appointments/``` for each route in the route file of the schema because it is already declared in ```app.use("/api/appointments")``` in the ```server.js``` file. Therefore, we have the following route declarations in this last file:
+
+1. For the **Appointment** schema: ```app.use("/api/appointments", appointmentRoutes);```
+2. 
+
+## First update of the ```server.js``` file
+So far, we should have the following code in our ```server.js``` file:
+
+```javascript
+import express from "express";
+import appointmentRoutes from "./routes/appointmentRoutes.js";
+
+const app = express();
+
+app.use("/api/appointments/", appointmentRoutes); // Added the route maintainability for the Appointment schema.
+
+app.listen(5001, () => {
+    console.log("Server started on PORT: 5001")
+});
+```
+
 
 ## Database configuration
-One of the most important aspects of the backend functionality is.
+From this point on, we can proceed to configure our database in MongoDB to start defining our schemas with Mongoose, which would allow us to finally start working with data in our project.
+
+The following are the steps I followed to configure a database in MongoDB:
+
+1. **Download and install** [MongoDB Community](https://www.mongodb.com/try/download/community) (the free, open-source MongoDB edition for developers).
+2. **Create an account** or **log in** in the [MongoDB's official website](https://www.mongodb.com/).
+3. **Create a new project** and initialize it with a free Cluster.
+4. Retrieve the database **user credentials** (used to authenticate our connection to the database).
+5. Retrieve the **connection string** (used to perform the connection to the database from our project's code).
 
 ## Configuration of `.env`
-A .env file contains the
+A ```.env``` file contains the global variables that we'll use in our project to perform backend-related actions, such as connecting to a local port and connecting to the database with the previously retrieved connection string.
 
-## Final files
+Let's create this file within the main backend folder, out of any subdirectory, so that we have the following structure.
+
+```
+- backend
+    - src
+        - controllers
+        - routes
+        - server.js
+    - .env
+```
+
+In the ```.env``` file, let's create the following global variables:
+
+```javascript
+PORT=5001
+MONGO_URI=<connection_string>
+```
+
+Where the connection string is the one we retrieved previously when we were configuring our database (see the [Database configuration section](#database-configuration)). No we've defined these global variables, we can use them anywhere in our backend files by doing the following:
+
+- Importing dotenv (```import dotenv from "dotenv"```) in the file.
+- Calling the ```dotenv.config()``` function.
+- Using the global variable as ```process.env.VARIABLE_NAME```.
+
+See how I used the global ```PORT``` and ```MONGO_URI``` variables in different files in the following sections.
+
+## Second update of the ```server.js``` file
+So far, we should have the following code in our ```server.js``` file:
+
+```javascript
+import mongoose from "mongoose";
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import colors from "colors";
+import appointmentRoutes from "./routes/appointmentRoutes.js";
+import { connectDB } from "../config/db.js";
+
+dotenv.config();
+const app = express();
+
+// Calling the connection method.
+connectDB();
+
+app.use("/api/appointments", appointmentRoutes);
+// We'll add here the rest of the routes, such as contact messages, clients, therapists, etc...
+
+app.use(cors());
+
+// Using the global variable 'PORT'.
+app.listen(process.env.PORT, () => {
+    console.log(`Server started on PORT: 5001`.green)
+});
+```
+
+## The ```db.js``` file
+Let's create a new subfolder in our directory and name it as "config". Within it, we create the ```db.js``` file, intended to perform the connection to our MongoDB database.
+
+```javascript
+import mongoose from 'mongoose';
+import dotenv from "dotenv";
+import colors from "colors";
+
+dotenv.config();
+
+export const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
+
+        console.log(Successful conection to the database..blue);
+    } catch (error) {
+        console.error(Error connecting to MongoDB.red, error);
+        console.log(process.env.MONGOURL);
+    }
+}
+```
+
+See how we used the ```MONGO_URI``` global variable in the line number 9, which contains the connection string needed to succesfully connect to our database.
+
+If the connection fails, the error will be printed so that we can know the reason why it failed and address it.
