@@ -163,3 +163,11 @@ Here, we first import the Express module and the controller files from their loc
 
 ## Universal routes with `app.use()`
 Write how is `app.use("/api/appointments/", appointmentRoutes);` used to make it possible to improve the maintainabilty of the route declaration.
+
+## Database configuration
+One of the most important aspects of the backend functionality is.
+
+## Configuration of `.env`
+A .env file contains the
+
+## Final files
