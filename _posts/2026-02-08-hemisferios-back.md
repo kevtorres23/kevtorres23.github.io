@@ -2,7 +2,7 @@
 title: HWS | Backend Documentation
 date: 2026-02-08 02:55:00 -500
 categories: [Hemisferios' Web System]
-tags: [react,ui,backend,express,mongodb,node,tailwindcss,shadcn]
+tags: [backend,ui,mongodb,express,react,node]
 published: true
 ---
 
@@ -65,8 +65,31 @@ npm install colors
 
 I used this particular set of modules based on my personal preferences, but any other dependencies that could be useful in the backend development process can be incorporated into the environment if needed.
 
+## Conventional folder structure
+Before continuing, let's organize our backend directory by creating different sub-folders that help us organize our code more efficiently. The following is a conventional, recommended way to structure our backend:
+
+```
+- backend
+    - src
+        - controllers
+        - routes
+        - server.js
+```
+
+**Note**: After creating this new folder arrangement, it is necessary to update the ```package.json``` file to indicate the location that the ```server.js``` file will have once we create it, as it follows:
+
+```javascript
+"main": "src/server.js",
+"scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+},
+```
+
+It is important to notice that the ```dev``` script has the ```nodemon``` keyword before the route of the```server.js``` file. It was added to indicate that we want to **run our development server with Nodemon**, so that the functionality of this module is actually implemented (automatically refresh our server every time that changes are detected).
+
 ## Initialization of the ```server.js``` file
-By convention, the ```server.js``` file in the backend directory of a MERN project is used to initialize a server connection to a specific port using Express. Initially, my server.js file looked like this:
+By convention, the ```server.js``` file in the backend directory of a MERN project is used to initialize our server connection to a specific port using Express. Just created, it looks like this:
 
 ```javascript
 import express from "express";
@@ -89,3 +112,54 @@ Here, we initialize the connection to the port 5001 (in my case) using the Expre
 ```javascript
 "type": "module" // Set to ES6.
 ```
+
+From here, the following steps are creating our routes and controllers to let the client interact with the server dynamically in our application. In the following sections, I'll explain how I achieved this.
+
+## Routes
+A route can be understood as a **URL contained in an HTTP method that allows the client to perform different tasks, requests, and actions**. In Express, routes are defined with the ```Router()``` function.
+
+The *routes* folder, within the *src* directory, is the place where we'll save our route configuration files.
+
+The following are the route files I created and their purpose for the project:
+
+- ```appointmentRoutes.js```
+- ```contactMessageRoutes.js```
+- ```patientRoutes.js```
+- ```therapistRoutes.js```
+
+## Controllers
+A controller can be defined as a function that we create and that we can call in different locations or contexts in our project. In simple words, **they get a request, consult the logic to know what to do with it, and finally return a response**.
+
+The *controllers* folder, within the *src* directory, is the place where we'll save our controllers. The following are the controller files I created for the project:
+
+- ```appointmentControllers.js```
+- ```contactMessageControllers.js```
+- ```patientControllers.js```
+- ```therapistControllers.js```
+
+## Interaction between routes and controllers
+The main purpose of separating our routes from our controllers, is to make our code more maintainable and optimal. To make them interact with each other, we need to **include the controllers within the routes**, as it follows, in the ```appointmentRoutes.js```:
+
+```javascript
+import express from "express";
+import { getAllAppointments, createAppointment, updateAppointment, deleteAppointment } from "../controllers/appointmentControllers.js";
+
+const router = express.Router();
+
+// Route definition.
+
+router.get("/", getAllAppointments);
+
+router.post("/", createAppointment);
+
+router.put("/:id", updateAppointment);
+
+router.delete("/:id", deleteAppointment);
+
+export default router;
+```
+
+Here, we first import the Express module and the controller files from their location in the directory. Then, we include them in the parameters of the router's HTTP method parameters.
+
+## Universal routes with `app.use()`
+Write how is `app.use("/api/appointments/", appointmentRoutes);` used to make it possible to improve the maintainabilty of the route declaration.
