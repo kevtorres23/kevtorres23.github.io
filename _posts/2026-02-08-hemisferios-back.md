@@ -122,20 +122,28 @@ The *routes* folder, within the *src* directory, is the place where we'll save o
 
 The following are the route files I created:
 
-- ```appointmentRoutes.js```
-- ```contactMessageRoutes.js```
-- ```patientRoutes.js```
-- ```therapistRoutes.js```
+```
+- src
+    - controllers
+        - appointmentRoutes.js
+        - contactMessageRoutes.js
+        - patientRoutes.js
+        - therapistRoutes.js
+```
 
 ## Controllers
 A controller can be defined as a function that we create and that we can call in different locations or contexts in our project. In simple words, **they get a request, consult the logic to know what to do with it, and finally return a response**.
 
 The *controllers* folder, within the *src* directory, is the place where we'll save our controllers. The following are the controller files I created for the project:
 
-- ```appointmentControllers.js```
-- ```contactMessageControllers.js```
-- ```patientControllers.js```
-- ```therapistControllers.js```
+```
+- src
+    - controllers
+        - appointmentControllers.js
+        - contactMessageControllers.js
+        - patientControllers.js
+        - therapistControllers.js
+```
 
 ## Interaction between routes and controllers
 The main purpose of separating our routes from our controllers, is to make our code more maintainable and optimal. To make them interact with each other, we need to **include the controllers within the routes**, as it follows, in the ```appointmentRoutes.js```:
@@ -294,3 +302,66 @@ export const connectDB = async () => {
 See how we used the ```MONGO_URI``` global variable in the line number 9, which contains the connection string needed to succesfully connect to our database.
 
 If the connection fails, the error will be printed so that we can know the reason why it failed and address it.
+
+## Models
+In non-relational databases such as MongoDB, a model can be understood as **a method that allows accessing the data of a collection in our database and interacting with it**. It serves as an API that **allows us read, create, update, and delete data** of that collection.
+
+To define them in our project, we'll need to create a new folder named "models" within the "src" subfolder in the root backend directory.
+
+Within this new folder, we can create a file for each collection of our project, where we define two things:
+
+1. The **schema** of the collection: the structure it will have and the types of the data it should collect.
+2. The actual **model** of the collection: the model that will allow us to interact and manipulate the collected data, based on the defined schema.
+
+We define a model as it follows:
+
+```javascript
+import mongoose from "mongoose";
+
+const appointmentSchema = new mongoose.Schema({
+    patientName: {
+        type: String,
+        required: true
+    },
+    motherSurname: {
+        type: String,
+        required: true
+    },
+    fatherSurname: {
+        type: String,
+        required: true
+    },
+    phoneNumber: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: String,
+        required: true
+    },
+    hour: {
+        type: String,
+        required: true
+    },
+},
+    {timestamps: true}
+);
+
+const Appointment = mongoose.model("Appointment", appointmentSchema);
+
+export default Appointment;
+```
+
+We first import the Mongoose module. Then, we use it to create a new Schema, where the data types and its obligatoriness.
+
+Then, create the model as a constant using the model function, which receives two parameters, its name and its schema, which we just created.
+
+The following is a list of the schema files I created for the project for its corresponding collection:
+
+```
+- src
+    - models
+        - Appointment.js
+        -
+        -
+```
