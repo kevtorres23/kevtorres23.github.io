@@ -49,7 +49,7 @@ Then, we can start adding components to our project as it follows:
 
 ```npx shadcn@latest add <componentName>```
 
-Refer to the [official documentation](http://ui.shadcn.com/docs/components) to see the components that can be installed.
+Refer to the [official documentation](https://ui.shadcn.com/docs/components) to see the components that can be installed.
 
 ## Folder Structure
 Since this project contains two separated views, one for the **website**, accessible for all users, and one for the **appointment system**, accesible for administrators only, I was looking for a folder structure that allowed me to easily find and maintain the files that correspond to each view.
